@@ -1,0 +1,16 @@
+{
+	"name": "@codeboratory/batch-prompter",
+	"type": "module",
+	"scripts": {
+		"format": "bunx biome check --write ."
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4"
+	},
+	"peerDependencies": {
+		"typescript": "^5",
+		"@types/bun": "^1.2.4",
+		"@anthropic-ai/sdk": "^0.39.0",
+		"openai": "^4.86.2"
+	}
+}
