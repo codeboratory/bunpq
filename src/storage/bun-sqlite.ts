@@ -1,3 +1,4 @@
+// TODO: why is it not @types/bun?
 import type { Database, Statement } from "bun:sqlite";
 import type {
 	BatchStatus,
@@ -17,23 +18,28 @@ export class BunSQLiteStorage implements Storage {
 	private $update_message: Statement;
 
 	constructor(
+		// TODO: can we make this general
+		// for at least all SQLite DBs?
 		database: Database,
 		batch_table = "batch",
 		message_table = "message",
 	) {
+		// TODO: add model table
+		// TODO: add logging
 		database.run(`
 			CREATE TABLE IF NOT EXISTS ${batch_table} (
 				id TEXT PRIMARY KEY,
 				status TEXT NOT NULL
 			);
 
-			CREATE INDEX ${batch_table}_status_idx ON ${batch_table}(status);
+			CREATE INDEX IF NOT EXISTS ${batch_table}_status_idx ON ${batch_table}(status);
 
 			CREATE TABLE IF NOT EXISTS ${message_table} (
 				id TEXT PRIMARY KEY,
 				batch_id TEXT NOT NULL,
 				status TEXT NOT NULL,
-				content TEXT NOT NULL,
+				input TEXT NOT NULL,
+				output TEXT,
 				input_tokens INTEGER,
 				output_tokens INTEGER,
 				cache_creation_input_tokens INTEGER,
@@ -42,38 +48,39 @@ export class BunSQLiteStorage implements Storage {
 				FOREIGN KEY(batch_id) REFERENCES ${batch_table}(id)
 			);
 
-			CREATE INDEX message_batch_id_idx ON ${message_table}(batch_id);
-			CREATE INDEX message_status_idx ON ${message_table}(status);
+			CREATE INDEX IF NOT EXISTS message_batch_id_idx ON ${message_table}(batch_id);
+			CREATE INDEX IF NOT EXISTS message_status_idx ON ${message_table}(status);
 		`);
 
-		this.$create_batch = database.prepare(`
+		this.$create_batch = database.query(`
 			INSERT OR IGNORE INTO 
 			${batch_table} (id, status) 
 			VALUES ($id, $status);
 		`);
 
-		this.$update_batch = database.prepare(`
+		this.$update_batch = database.query(`
 			UPDATE OR IGNORE ${batch_table}	
 			SET status = $status
 			WHERE id = $id;
 		`);
 
-		this.$random_batches = database.prepare(`
+		this.$random_batches = database.query(`
 			SELECT id FROM ${batch_table}
 			WHERE status = $status
 			ORDER BY RANDOM()
 			LIMIT $limit;
 		`);
 
-		this.$create_message = database.prepare(`
+		this.$create_message = database.query(`
 			INSERT OR IGNORE INTO
-			${message_table} (id, batch_id, status, content)
-			VALUES ($id, $batch_id, $status, $content);
+			${message_table} (id, batch_id, status, input)
+			VALUES ($id, $batch_id, $status, $input);
 		`);
 
-		this.$update_message = database.prepare(`
+		this.$update_message = database.query(`
 			UPDATE OR IGNORE ${message_table}	
 			SET status = $status, 
+			output = COALESCE($output, output),
 			cache_creation_input_tokens = COALESCE($cache_creation_input_tokens, cache_creation_input_tokens),
 			cache_read_input_tokens = COALESCE($cache_read_input_tokens, cache_read_input_tokens),
 			input_tokens = COALESCE($input_tokens, input_tokens),
@@ -111,7 +118,7 @@ export class BunSQLiteStorage implements Storage {
 			$id: message_data.id,
 			$batch_id: message_data.batch_id,
 			$status: message_data.status,
-			$content: message_data.content,
+			$input: message_data.input,
 		});
 	}
 
@@ -119,6 +126,7 @@ export class BunSQLiteStorage implements Storage {
 		this.$update_message.run({
 			$id: message_data.id,
 			$status: message_data.status,
+			$output: message_data.output,
 			$cache_creation_input_tokens: message_data.cache_creation_input_tokens,
 			$cache_read_input_tokens: message_data.cache_read_input_tokens,
 			$input_tokens: message_data.input_tokens,

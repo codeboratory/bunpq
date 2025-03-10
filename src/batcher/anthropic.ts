@@ -61,7 +61,7 @@ export class AnthropicBatcher implements Batcher {
 				id: message.id,
 				batch_id: batch.id,
 				status: "created",
-				content: message.content,
+				input: message.content,
 			});
 		}
 
@@ -98,6 +98,7 @@ export class AnthropicBatcher implements Batcher {
 					this.storage.updateMessage({
 						id: custom_id,
 						status: result.result.type,
+						output: content_block.text,
 						...usage,
 					});
 

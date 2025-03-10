@@ -27,12 +27,13 @@ export type MessageStorageCreate = {
 	id: string;
 	batch_id: string;
 	status: MessageStatus;
-	content: string;
+	input: string;
 };
 
 export type MessageStorageUpdate = {
 	id: string;
 	status: MessageStatus;
+	output?: string | null;
 	cache_creation_input_tokens?: number | null;
 	cache_read_input_tokens?: number | null;
 	input_tokens?: number | null;
