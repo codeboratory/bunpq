@@ -1,5 +1,5 @@
 {
-	"name": "@codeboratory/batch-prompter",
+	"name": "@codeboratory/bunpq",
 	"type": "module",
 	"version": "0.1.0",
 	"license": "MIT",
