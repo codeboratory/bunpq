@@ -37,6 +37,10 @@
 		"openai": "4.87.1"
 	},
 	"dependencies": {
-		"@codeboratory/bunlog": "0.1.2"
+		"@codeboratory/bunlog": "0.1.2",
+		"@google-cloud/aiplatform": "^4.1.0",
+		"@google-cloud/storage": "^7.15.2",
+		"@google/generative-ai": "^0.24.0",
+		"@paralleldrive/cuid2": "^2.2.2"
 	}
 }

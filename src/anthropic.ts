@@ -66,7 +66,7 @@ export class AnthropicBatcher extends Batcher<
 
 		this.logger.info(
 			"Anthropic.create",
-			`Batch with ${requests.length} messages has been created`,
+			`Batch with ${messages.length} messages has been created`,
 			batch.id,
 		);
 

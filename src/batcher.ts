@@ -81,14 +81,14 @@ export abstract class Batcher<
 
 		this.logger.debug("Batcher", "Create $create_batch statement");
 		this.$create_batch = database.query(`
-			INSERT OR IGNORE INTO 
-			batch (id, status) 
+			INSERT OR IGNORE INTO
+			batch (id, status)
 			VALUES ($id, $status);
 		`);
 
 		this.logger.debug("Batcher", "Create $update_batch statement");
 		this.$update_batch = database.query(`
-			UPDATE OR IGNORE batch	
+			UPDATE OR IGNORE batch
 			SET status = $status
 			WHERE id = $id;
 		`);
@@ -102,8 +102,8 @@ export abstract class Batcher<
 
 		this.logger.debug("Batcher", "Create $update_message statement");
 		this.$update_message = database.query(`
-			UPDATE OR IGNORE message	
-			SET status = $status, 
+			UPDATE OR IGNORE message
+			SET status = $status,
 			output = COALESCE($output, output),
 			cache_creation_input_tokens = COALESCE($cache_creation_input_tokens, cache_creation_input_tokens),
 			cache_read_input_tokens = COALESCE($cache_read_input_tokens, cache_read_input_tokens),
